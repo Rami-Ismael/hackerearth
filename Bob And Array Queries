@@ -1,0 +1,116 @@
+import java.io.*;
+
+import java.math.*;
+import java.util.*;
+
+
+
+public class TestClass {
+
+    static MyScanner in = new MyScanner();
+    static   PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out));
+    int N;
+    static int [] seg;
+    public static void main(String args[]) throws IOException {
+        //this probelm reduce into range sum query 
+        int N = in.nextInt(); int Q = in.nextInt();
+        //all the one will be the lef of the segment tree
+        seg = new int[4*N];
+        while(Q-->0){
+            int action = in.nextInt();
+            if(action==1){
+                int x  = in.nextInt();
+                x--;
+                update(1, 0, N-1, x, x,1);
+            }else if(action==2){
+                int x = in.nextInt();
+                x--;
+                update(1, 0, N-1, x, x, -1);
+            }else{
+                int x = in.nextInt(); int y = in.nextInt();
+                int ans = rmq(1, 0, N-1, x-1, y-1);
+                pw.println(ans);
+            }
+        }
+        pw.flush();
+
+    }
+    static int getMid(int L,int R){
+        return L+(R-L)/2;
+    }
+    static void update(int cur, int L,int R,int i,int j,int val){
+        if(i>R||j<L) return ;
+        if(L>=i&&R<=j){
+           if(val==-1){
+            if(seg[cur]!=0){
+                seg[cur]+=val;
+            }
+           }
+            else{
+                seg[cur]+=val;
+            }
+        }else{
+            int mid = getMid(L, R);
+            update(cur<<1, L, mid, i, j,val);
+            update((cur<<1)+1, mid+1 , R, i, j,val);
+                seg[cur] = seg[cur<<1]+seg[(cur<<1)+1];
+        }
+    }
+    static  int rmq(int cur,int L,int R,int i,int j){
+        if(i>R||j<L)return 0;;
+        if(L>=i&&R<=j){
+            return seg[cur];
+        }else{
+            int mid  = getMid(L, R);
+            int left = rmq(cur<<1, L, mid, i, j);
+            int right = rmq((cur<<1)+1, mid+1  , R, i, j);
+            return left+right;
+        }
+    }
+    
+  
+
+
+    public static class MyScanner {
+        BufferedReader br;
+        StringTokenizer st;
+   
+        public MyScanner() {
+           br = new BufferedReader(new InputStreamReader(System.in));
+        }
+   
+        String next() {
+            while (st == null || !st.hasMoreElements()) {
+                try {
+                    st = new StringTokenizer(br.readLine());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return st.nextToken();
+        }
+   
+        int nextInt() {
+            return Integer.parseInt(next());
+        }
+   
+        long nextLong() {
+            return Long.parseLong(next());
+        }
+   
+        double nextDouble() {
+            return Double.parseDouble(next());
+        }
+   
+        String nextLine(){
+            String str = "";
+        try {
+           str = br.readLine();
+        } catch (IOException e) {
+           e.printStackTrace();
+        }
+        return str;
+        }
+  
+     }
+}
