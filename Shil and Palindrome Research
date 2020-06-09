@@ -1,0 +1,113 @@
+mport java.io.*;
+import java.math.*;
+import java.util.*;
+
+public class Palindrome {
+    static int [][] BIT;
+    static int N,Q;
+    static MyScanner in = new MyScanner();
+    static   PrintWriter out = new PrintWriter(new OutputStreamWriter(System.out));
+    public static void main(String[] args) {
+         N = in.nextInt();  Q = in.nextInt();
+        BIT = new int[27][N+1];
+        //the line
+        char[] line = in.nextLine().toCharArray();
+        for(int i=0;i<N;i++){
+            int at = line[i]-'a';
+            update(at, i+1, 1);
+        }
+        while(Q-->0){
+            int action = in.nextInt();
+            if(action==1){
+               int L = in.nextInt();
+               String x = in.next();
+                int at = line[L-1]-'a';
+                update(at, L, -1);
+                line[L-1] = x.charAt(0);
+                int to = x.charAt(0)-'a';
+                update(to,L,1);
+            }else{
+                int L = in.nextInt();
+                int R = in.nextInt();
+                int odd = 0;
+                for(int i=0;i<26;i++){
+                    int val = query(i, L , R);
+                    if(isOdd(val))
+                        odd++;
+                }
+                if(odd>1){
+                    out.println("no");
+                }else{
+                    out.println("yes");
+                }
+            }
+        }
+    out.flush();
+
+    }
+    static boolean isOdd(int i){
+        return (i&1)==1;
+    }
+    static int lsb(int i){
+        return i&-i;
+    }
+    static void update(int y, int idx,int val){
+        while(idx<=N){
+            BIT[y][idx] +=val;
+            idx+=(lsb(idx));
+        }
+    }
+    static int prefix(int y, int idx){
+        int sum=0;
+        while(idx>0){
+            sum+=BIT[y][idx];
+            idx-=lsb(idx);
+        }
+        return sum;
+    }
+    static int query(int y,int l,int r){
+        return prefix(y, r)-prefix(y, l-1);
+    }
+    public static class MyScanner {
+        BufferedReader br;
+        StringTokenizer st;
+   
+        public MyScanner() {
+           br = new BufferedReader(new InputStreamReader(System.in));
+        }
+   
+        String next() {
+            while (st == null || !st.hasMoreElements()) {
+                try {
+                    st = new StringTokenizer(br.readLine());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return st.nextToken();
+        }
+   
+        int nextInt() {
+            return Integer.parseInt(next());
+        }
+   
+        long nextLong() {
+            return Long.parseLong(next());
+        }
+   
+        double nextDouble() {
+            return Double.parseDouble(next());
+        }
+   
+        String nextLine(){
+            String str = "";
+        try {
+           str = br.readLine();
+        } catch (IOException e) {
+           e.printStackTrace();
+        }
+        return str;
+        }
+  
+     }
+}
