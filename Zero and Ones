@@ -1,0 +1,75 @@
+import java.io.*;
+import java.math.*;
+import java.util.*;
+public class ZeroandOnes {
+    static int [] seg;
+    static MyScanner in = new MyScanner();
+    static   PrintWriter out = new PrintWriter(new OutputStreamWriter(System.out));
+    public static void main(String[] args) {
+        int N =in.nextInt();
+        int Q = in.nextInt();
+        seg = new int[4*N];
+        build(1, 0, N-1);
+        while(Q-->0){
+            int action = in.nextInt();
+            if(action==0){
+                int index =in.nextInt();
+                index--;
+                //int val =   find_kth(1,0,N-1,index);
+                update(1, 0, N-1, index, index);
+            }else{
+                int index = in.nextInt();
+                if(seg[1]<index){
+                    out.println(-1);
+                }else{
+                int val =find_kth(1, 0, N-1, index);
+                    out.println(val+1);
+                }
+            }
+        }
+        out.flush();
+ 
+ 
+    }
+  static  int getMid(int L, int R){
+        return(L+R)>>>1;
+    }
+    static int getLeft(int cur){
+        return cur<<1;
+    }
+    static int getRight(int cur){
+        return getLeft(cur)+1;
+    }
+    static void build(int cur, int L, int R){
+        if(L==R){
+            seg[cur] = 1;
+        }else{
+            int mid = getMid(L, R);
+            build(getLeft(cur), L, mid);
+            build(getRight(cur), mid+1, R);
+            seg[cur] = seg[getLeft(cur)]+seg[getRight(cur)];
+        }
+    }
+    static int find_kth(int cur, int L, int R,int k){
+        if(L==R)
+        return L;
+        int mid = getMid(L, R);
+        int left = seg[cur<<1];
+        if(seg[cur<<1]>=k){
+            return find_kth(cur<<1, L, mid, k);
+        }else{
+            return find_kth((cur<<1)+1, mid+1, R, k-seg[cur<<1]);
+        }
+ 
+    }
+    static  void update(int cur, int L, int R,int i, int j){
+        if(i>R||j<L) return;
+        if(L>=i&&R<=j){
+            seg[cur] = 0;
+        }else{
+            int mid = getMid(L, R);
+            update(cur<<1, L, mid, i, j);
+            update((cur<<1)+1, mid+1, R, i, j);
+            seg[cur] = seg[cur<<1]+seg[(cur<<1)+1];
+        }
+    }
